@@ -1,0 +1,13 @@
+programa fatorial
+  inteiro n fat
+inicio
+  escreva "Digite o valor de n: "
+  leia n
+  fat <- 1
+  enquanto n > 0 faca
+     fat <- fat * n
+     n <- n - 1
+  fimenquanto
+  escreva "fatorial = "
+  escreva fat
+fimprograma

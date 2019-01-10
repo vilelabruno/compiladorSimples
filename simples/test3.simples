@@ -1,0 +1,13 @@
+programa maior
+  inteiro a b
+inicio
+  escreva "digite o valor de a: "
+  leia a
+  escreva "digite o valor de b: "
+  leia b
+  escreva "o maior valor eh: "
+  se nao(a < b)
+     entao escreva a
+     senao escreva b
+  fimse
+fimprograma
