@@ -1,0 +1,18 @@
+programa temraiz
+   inteiro a b c delta
+inicio
+   escreva "digite a: "
+   leia a
+   escreva "digite b: "
+   leia b
+   escreva "digite c: "
+   leia c
+   delta <- b * b - 4 * a * c
+   se delta < 0
+      entao escreva "Nao tem raiz real"
+	  senao se delta = 0
+	           entao escreva "Tem uma raiz"
+			   senao escreva "Tem duas raizes"
+			fimse
+    fimse
+fimprograma

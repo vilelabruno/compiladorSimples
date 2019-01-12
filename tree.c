@@ -1,7 +1,8 @@
 
 #include "tree.h"
 int contaGrau = 0;
-
+int contaGrau2 = 0;
+int controlVar = -1;
 ptno criaNo(int tipo, char *valor){
 	ptno n = (ptno) malloc (sizeof(struct no));
 	n->tipo = tipo;
@@ -24,13 +25,14 @@ void adicionaFilho(ptno pai, ptno filho){
 	}	
 }
 
-void mostra(ptno raiz, int nivel){
+void geramips(ptno raiz, int nivel){
 	ptno p;
 	int i;
 	for(i = 0; i < nivel; i++)
 		printf("..");
 	switch(raiz->tipo){
-		case 9: 	printf ("texto _const%s\n", raiz->valor); break;
+		case 9: 	
+			printf ("texto _const%s\n", raiz->valor); break;
 		case 10: 	printf ("programa\n"); break;
 		case 11: 	printf ("declaracao de variaveis\n"); break;
 		case 12: 	printf ("tipo: %s\n", raiz->valor); break;
@@ -59,12 +61,62 @@ void mostra(ptno raiz, int nivel){
 	}
 	p = raiz->filho;
 	while(p) {
-		mostra(p, nivel+1);
+		geramips(p, nivel+1);
 		p = p->irmao;
 	}
 
 }
-void geradot(ptno raiz, int nivel){
+void controlaGeraMips(ptno p){
+	cabecalho(p);
+	escreveTexto(p);
+	geravars(p);
+
+}
+
+void cabecalho(ptno p){
+	printf(".data\n\t_esp: .asciiz \" \"\n\t_ent: .asciiz \"\\n\"\n");
+}
+
+void escreveTexto(ptno p){
+	if (!p) return;
+	if(p->tipo == 9) {
+		printf("	_const%d: .asciiz %s \n", contaGrau2, p->valor);
+		contaGrau2++;
+	}
+	ptno aux = p;
+	while (p->filho){
+		escreveTexto(p->filho);
+		p = p->filho;
+	}
+	p = aux;
+	escreveTexto(p->irmao);
+
+}
+
+void geravars(ptno p){
+	if (!p) return;
+	if(p->tipo == 29 && controlVar == 0) {
+		printf("	%s: .word 1 \n", p->valor);
+	}
+	if(p->tipo == 14){
+		printf(".text\n\t.globl main\nmain:	nop\n");
+		return;
+	}
+	if(p->tipo == 11){
+		controlVar = 0;
+	}
+
+	//printf("%d\n", p->tipo);
+	ptno aux = p;
+	while (p->filho) {
+		geravars(p->filho); 
+		p = p->filho;
+	}
+	p = aux;
+	geravars(p->irmao);
+}
+
+void geradot(ptno raiz){
 	ptno p;
 	
 	p = raiz->filho;
@@ -72,7 +124,7 @@ void geradot(ptno raiz, int nivel){
 	if (raiz) {
 		if (raiz->valor){
 			switch(raiz->tipo){
-				case 9: 	printf ("\tn%p [label = \"<f0>texto | <f1> _const%s \"]; \n", raiz, raiz->valor); break;
+				case 9: 	printf ("\tn%p [label = \"<f0>texto | <f1> _const%d \"]; \n", raiz, contaGrau); contaGrau++; break;
 				case 10: 	printf ("\tn%p [label = \"<f0>programa | <f1>  \"]; \n", raiz); break;
 				case 11: 	printf ("\tn%p [label = \"<f0>declaracao de variaveis | <f1>  \"]; \n", raiz); break;
 				case 12: 	printf ("\tn%p [label = \"<f0>tipo | <f1> %s \"]; \n", raiz, raiz->valor); break;
@@ -132,7 +184,7 @@ void geradot(ptno raiz, int nivel){
 		}
 	}
 	while(p) {
-		geradot(p, nivel+1);
+		geradot(p);
 		if (p) printf ( "\tn%p -> n%p; \n" , raiz, p);	
 		p = p->irmao;
 	}

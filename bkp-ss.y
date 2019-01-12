@@ -26,7 +26,7 @@ void yyerror(char *);
 %token T_INICIO
 %token T_FIM
 %token T_IDENTIF
-%token T_STRING
+%token T_ALL
 
 %token T_LEIA
 %token T_ESCREVA
@@ -43,6 +43,7 @@ void yyerror(char *);
 %token T_MENOS
 %token T_VEZES
 %token T_DIV
+%token T_QUOTE
 
 %token T_MAIOR
 %token T_MENOR
@@ -80,7 +81,7 @@ programa
 		{
 			no = criaNo(programa, "programa"); adicionaFilho(no, $5);adicionaFilho(no, $3); adicionaFilho(no, $2); root = no;
 			if(argg[1] == 'd'){
-				printf("digraph {\n node [shape=record, height=.1];\n");geradot(root);printf("}");
+				printf("digraph {\n node [shape=record, height=.1];\n");geradot(root,0);printf("}");
 			}else if(argg[1] == 'g'){
 				controlaGeraMips(root);
 			}else{
@@ -326,8 +327,10 @@ expressao
 		 	adicionaFilho(no, $1);
 		 	$$ = no;
 		}
-	| termo	{$$=$1;}
+
+	| termo{$$ = $1;}
 	;
+
 
 termo
 	: 	T_IDENTIF 
@@ -338,12 +341,12 @@ termo
 			$$ = criaNo(variavel, atomo); 
 		 	
 		}
-	| T_STRING
+	| T_QUOTE T_ALL T_QUOTE
 		{
 			printf(""); no = criaNo(texto, atomo);
 		 	$$ = no;
 		}
-	| T_NUMERO 
+	|	T_NUMERO 
 		{
 			printf(""); $$ = criaNo(numero, atomo);
 		 	

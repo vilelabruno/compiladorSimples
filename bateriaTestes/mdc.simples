@@ -1,0 +1,16 @@
+programa maximodivisorcomum
+  inteiro a b
+inicio
+  escreva "a? "
+  leia a
+  escreva "b? "
+  leia b
+  enquanto nao (a = b) faca
+      se a > b
+	     entao a <- a - b
+		 senao b <- b - a
+      fimse
+  fimenquanto
+  escreva "O MDC = "
+  escreva a
+fimprograma

@@ -4,6 +4,7 @@
 %}
 
 identificador	[a-zA-Z]([a-zA-Z0-9])*
+string     \".*.\"
 numero		[0-9]+
 espaco		[\r \t]+
 novalinha	[\n]
@@ -37,8 +38,6 @@ div		return T_DIV;
 ">"		return T_MAIOR;
 "<"		return T_MENOR;
 "="		return T_IGUAL;
-\".*.\"      return T_QUOTE;
-e		return T_E;
 ou		return T_OU;
 nao		return T_NAO;
 
@@ -67,4 +66,6 @@ F		return T_F;
 
 .		ERRO ("ERRO LEXICO");
 
+{string}	{ strcpy (atomo, yytext); 
+					return T_STRING; }
 %%
