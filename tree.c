@@ -3,6 +3,7 @@
 int contaGrau = 0;
 int contaGrau2 = 0;
 int controlVar = -1;
+int contaConstante = 0;
 ptno criaNo(int tipo, char *valor){
 	ptno n = (ptno) malloc (sizeof(struct no));
 	n->tipo = tipo;
@@ -25,95 +26,44 @@ void adicionaFilho(ptno pai, ptno filho){
 	}	
 }
 
-void geramips(ptno raiz, int nivel){
+void geramips(ptno raiz){
+	if (!raiz) return;
+	if(raiz->tipo == 14) controlVar = 2;
 	ptno p;
 	int i;
-	for(i = 0; i < nivel; i++)
-		printf("..");
-	switch(raiz->tipo){
-		case 9: 	
-			printf ("texto _const%s\n", raiz->valor); break;
-		case 10: 	printf ("programa\n"); break;
-		case 11: 	printf ("declaracao de variaveis\n"); break;
-		case 12: 	printf ("tipo: %s\n", raiz->valor); break;
-		case 13: 	printf ("lista variaveis\n") ; break;
-		case 14: 	printf ("lista comandos\n") ; break;
-		case 15: 	printf ("leitura\n") ; break;
-		case 16: 	printf ("escrita\n"); break;
-		case 17: 	printf ("repeticao\n") ; break;
-		case 18: 	printf ("selecao\n") ; break;
-		case 19: 	printf ("atribuicao\n") ; break;
-		case 20: 	printf ("multiplicacao\n") ; break;
-		case 21: 	printf ("divisao\n"); break;
-		case 22: 	printf ("soma\n") ; break;
-		case 23: 	printf ("subtracao\n") ; break;
-		case 24: 	printf ("compara maior\n") ; break;
-		case 25: 	printf ("compara menor\n") ; break;
-		case 26: 	printf ("compara igual\n"); break;
-		case 27: 	printf ("conjucao\n") ; break;
-		case 28: 	printf ("disjuncao\n") ; break;
-		case 29: 	printf ("identificador: %s\n", raiz->valor); break;
-		case 30: 	printf ("variavel: %s\n", raiz->valor); break;
-		case 31: 	printf ("numero: %s\n", raiz->valor) ; break;
-		case 32: 	printf ("verdadeiro\n") ; break;
-		case 33: 	printf ("falso\n") ; break;
-		case 34: 	printf ("negacao (NAO)\n") ; break;		
-	}
-	p = raiz->filho;
-	while(p) {
-		geramips(p, nivel+1);
-		p = p->irmao;
-	}
-
-}
-void controlaGeraMips(ptno p){
-	cabecalho(p);
-	escreveTexto(p);
-	geravars(p);
-
-}
-
-void cabecalho(ptno p){
-	printf(".data\n\t_esp: .asciiz \" \"\n\t_ent: .asciiz \"\\n\"\n");
-}
-
-void escreveTexto(ptno p){
-	if (!p) return;
-	if(p->tipo == 9) {
-		printf("	_const%d: .asciiz %s \n", contaGrau2, p->valor);
-		contaGrau2++;
-	}
-	ptno aux = p;
-	while (p->filho){
-		escreveTexto(p->filho);
+	p = raiz;
+	while(p->filho) {
+		geramips(p->filho);
 		p = p->filho;
 	}
-	p = aux;
-	escreveTexto(p->irmao);
+	if (controlVar == 2){
+		switch(raiz->tipo){
+			case 9: 	
+				printf ("\tla $a0 _const%d\n", contaGrau2); contaGrau2++; break;
+			case 15: 	
+				printf ("\tli $v0, 5\n\tsyscall\n\tsw $v0, %s\n", raiz->filho->valor) ; break;
+			case 16: 	printf ("\n\tli $v0, 4\n\tsyscall\n"); break;
+			case 17: 	printf ("repeticao\n") ; break;
+			case 18: 	printf ("selecao\n") ; break;
+			case 19: 	printf ("\tsw $a0, %s\n", raiz->filho->valor) ; break;
+			case 20: 	printf ("multiplicacao\n") ; break;
+			case 21: 	printf ("divisao\n"); break;
+			case 22: 	printf ("soma\n") ; break;
+			case 23: 	printf ("subtracao\n") ; break;
+			case 24: 	printf ("compara maior\n") ; break;
+			case 25: 	printf ("compara menor\n") ; break;
+			case 26: 	printf ("compara igual\n"); break;
+			case 27: 	printf ("conjucao\n") ; break;
+			case 28: 	printf ("disjuncao\n") ; break;
+			case 31: 	printf ("\tli $a0 %s\n", raiz->valor) ; break;
+			case 32: 	printf ("verdadeiro\n") ; break;
+			case 33: 	printf ("falso\n") ; break;
+			case 34: 	printf ("negacao (NAO)\n") ; break;		
+		}
+	}
 
-}
+	geramips(raiz->irmao);
 
-void geravars(ptno p){
-	if (!p) return;
-	if(p->tipo == 29 && controlVar == 0) {
-		printf("	%s: .word 1 \n", p->valor);
-	}
-	if(p->tipo == 14){
-		printf(".text\n\t.globl main\nmain:	nop\n");
-		return;
-	}
-	if(p->tipo == 11){
-		controlVar = 0;
-	}
-
-	//printf("%d\n", p->tipo);
-	ptno aux = p;
-	while (p->filho) {
-		geravars(p->filho); 
-		p = p->filho;
-	}
-	p = aux;
-	geravars(p->irmao);
 }
 
 void geradot(ptno raiz){

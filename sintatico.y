@@ -82,7 +82,7 @@ programa
 			if(argg[1] == 'd'){
 				printf("digraph {\n node [shape=record, height=.1];\n");geradot(root);printf("}");
 			}else if(argg[1] == 'g'){
-				controlaGeraMips(root);
+				geramips(root);
 			}else{
 				ERRO("comando inválido");
 			}
